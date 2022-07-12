@@ -1,0 +1,815 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf100
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red108\green121\blue134;\red31\green31\blue36;\red252\green95\blue163;
+\red255\green255\blue255;\red122\green200\blue182;\red145\green212\blue98;\red252\green106\blue93;\red153\green232\blue213;
+\red150\green134\blue245;\red174\green243\blue125;}
+{\*\expandedcolortbl;;\csgenericrgb\c42394\c47462\c52518;\csgenericrgb\c12054\c12284\c14131;\csgenericrgb\c98839\c37355\c63833;
+\csgenericrgb\c100000\c100000\c100000;\csgenericrgb\c47716\c78607\c71403;\csgenericrgb\c56799\c83212\c38450;\csgenericrgb\c98912\c41558\c36568;\csgenericrgb\c59926\c90967\c83488;
+\csgenericrgb\c58752\c52717\c95948;\csgenericrgb\c68215\c95290\c48909;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab593
+\pard\tx593\pardeftab593\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 \cb3 //
+\f1 \cf0 \
+
+\f0 \cf2 //  ViewController.swift
+\f1 \cf0 \
+
+\f0 \cf2 //  WeatherApp
+\f1 \cf0 \
+
+\f0 \cf2 //
+\f1 \cf0 \
+
+\f0 \cf2 //  Created by Angela Yu on 23/08/2015.
+\f1 \cf0 \
+
+\f0 \cf2 //  Copyright (c) 2015 London App Brewery. All rights reserved.
+\f1 \cf0 \
+
+\f0 \cf2 //
+\f1 \cf0 \
+\
+
+\f0 \cf4 import\cf5  UIKit
+\f1 \cf0 \
+
+\f0 \cf4 import\cf5  CoreLocation\'e5
+\f1 \cf0 \
+
+\f0 \cf4 import\cf5  Alamofire
+\f1 \cf0 \
+
+\f0 \cf4 import\cf5  SwiftyJSON
+\f1 \cf0 \
+
+\f0 \cf4 import\cf5  UserNotifications
+\f1 \cf0 \
+\
+
+\f0 \cf4 class\cf5  WeatherViewController: \cf6 UIViewController\cf5 , \cf6 CLLocationManagerDelegate\cf5 , \cf7 ChangeCityDelegate\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 @IBOutlet\cf5  \cf4 weak\cf5  \cf4 var\cf5  faren: \cf6 UISwitch\cf5 !
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Constants
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 let\cf5  WEATHER_URL = \cf8 "http://api.openweathermap.org/data/2.5/weather"
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 let\cf5  APP_ID = \cf8 "e72ca729af228beabd5d20e3b7749713"
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 @IBAction\cf5  \cf4 func\cf5  `switch`(\cf4 _\cf5  sender: \cf6 UISwitch\cf5 ) \{
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 if\cf5  sender.\cf6 isOn\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //TODO: Declare instance variables here
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 let\cf5  locationManager = \cf6 CLLocationManager\cf5 ()
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 let\cf5  weatherDataModel = \cf7 WeatherDataModel\cf5 ()
+\f1 \cf0 \
+
+\f0 \cf5  
+\f1 \cf0 \
+
+\f0 \cf5   
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Pre-linked IBOutlets
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 @IBOutlet\cf5  \cf4 weak\cf5  \cf4 var\cf5  weatherIcon: \cf6 UIImageView\cf5 !
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 @IBOutlet\cf5  \cf4 weak\cf5  \cf4 var\cf5  cityLabel: \cf6 UILabel\cf5 !
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 @IBOutlet\cf5  \cf4 weak\cf5  \cf4 var\cf5  temperatureLabel: \cf6 UILabel
+\f1 \cf0 \
+\
+\
+
+\f0 \cf5     \cf4 @IBOutlet\cf5  \cf4 weak\cf5  \cf4 var\cf5  button: \cf6 UIButton\cf5 !
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 override\cf5  \cf4 func\cf5  viewDidLoad() \{
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 super\cf5 .\cf9 viewDidLoad\cf5 ()
+\f1 \cf0 \
+\
+
+\f0 \cf5         \cf2 //TODO: Request persmission for notifications
+\f1 \cf0 \
+
+\f0 \cf5         \cf6 UNUserNotificationCenter\cf5 .\cf9 current\cf5 ().\cf9 requestAuthorization\cf5 (options: [.\cf6 alert\cf5 , .\cf6 sound\cf5 , .\cf6 badge\cf5 ], completionHandler: \{didAllow, error \cf4 in
+\f1 \cf0 \
+
+\f0 \cf5         \})
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf2 //TODO:Set up the location manager here.
+\f1 \cf0 \
+
+\f0 \cf5         \cf7 locationManager\cf5 .\cf6 delegate\cf5  = \cf4 self
+\f1 \cf0 \
+
+\f0 \cf5         \cf7 locationManager\cf5 .\cf6 desiredAccuracy\cf5  = \cf6 kCLLocationAccuracyKilometer
+\f1 \cf0 \
+
+\f0 \cf5         \cf7 locationManager\cf5 .\cf9 requestAlwaysAuthorization\cf5 ()
+\f1 \cf0 \
+
+\f0 \cf5         \cf7 locationManager\cf5 .\cf9 startUpdatingLocation\cf5 ()
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf2 // coordination
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 let\cf5  geoFenceCenter : \cf6 CLLocationCoordinate2D\cf5  = \cf9 CLLocationCoordinate2DMake\cf5 (\cf10 34.0689\cf5 , \cf10 118.4452\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf9 print\cf5 (\cf8 "staring geofencing"\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5         \cf11 monitorRegionAtLocation\cf5 (center: geoFenceCenter, identifier: \cf8 "UCLA"\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5        
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  triggerNotification(bool : \cf6 Bool\cf5  )\{
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 let\cf5  content = \cf6 UNMutableNotificationContent\cf5 ()
+\f1 \cf0 \
+
+\f0 \cf5         content.\cf6 title\cf5  = \cf8 "Time to update you timecard!"
+\f1 \cf0 \
+
+\f0 \cf5         content.\cf6 badge\cf5  = \cf10 1
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 if\cf5  bool == \cf4 true\cf5 \{ \cf2 // user entered work
+\f1 \cf0 \
+
+\f0 \cf5             content.\cf6 body\cf5  = \cf8 "Tap to clock in!"
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 else\cf5 \{ \cf2 // user exited work
+\f1 \cf0 \
+
+\f0 \cf5             content.\cf6 body\cf5  = \cf8 "Tap to clock out!"
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 let\cf5  trigger = \cf6 UNTimeIntervalNotificationTrigger\cf5 (timeInterval: \cf10 1\cf5 , repeats: \cf4 false\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 let\cf5  request = \cf6 UNNotificationRequest\cf5 (identifier: \cf8 "updateTimeCard"\cf5 , content: content, trigger: trigger)
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf6 UNUserNotificationCenter\cf5 .\cf9 current\cf5 ().\cf9 add\cf5 (request, withCompletionHandler: \cf4 nil\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5   
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Monitoring a region around the specified coordinate
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  monitorRegionAtLocation(center: \cf6 CLLocationCoordinate2D\cf5 , identifier: \cf6 String\cf5  ) \{
+\f1 \cf0 \
+
+\f0 \cf5         \cf2 // Make sure the app is authorized.
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 if\cf5  \cf6 CLLocationManager\cf5 .\cf9 authorizationStatus\cf5 () == .\cf9 authorizedAlways\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5             \cf2 // Make sure region monitoring is supported.
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 if\cf5  \cf6 CLLocationManager\cf5 .\cf9 isMonitoringAvailable\cf5 (for: \cf6 CLCircularRegion\cf5 .\cf4 self\cf5 ) \{
+\f1 \cf0 \
+
+\f0 \cf5                 \cf2 // Register the region.
+\f1 \cf0 \
+
+\f0 \cf5                 \cf4 let\cf5  distance = \cf10 100
+\f1 \cf0 \
+
+\f0 \cf5                 \cf4 let\cf5  region = \cf6 CLCircularRegion\cf5 (center: center,
+\f1 \cf0 \
+
+\f0 \cf5                                               radius: \cf6 CLLocationDistance\cf5 (distance), identifier: identifier)
+\f1 \cf0 \
+
+\f0 \cf5                 region.\cf6 notifyOnEntry\cf5  = \cf4 true
+\f1 \cf0 \
+
+\f0 \cf5                 region.\cf6 notifyOnExit\cf5  = \cf4 true
+\f1 \cf0 \
+
+\f0 \cf5                 
+\f1 \cf0 \
+
+\f0 \cf5                 \cf7 locationManager\cf5 .\cf9 startMonitoring\cf5 (for: region)
+\f1 \cf0 \
+
+\f0 \cf5             \}
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 // Handling a region-entered notification
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  locationManager(\cf4 _\cf5  manager: \cf6 CLLocationManager\cf5 , didEnterRegion region: \cf6 CLRegion\cf5 ) \{
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 if\cf5  \cf4 let\cf5  region = region \cf4 as\cf5 ? \cf6 CLCircularRegion\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 let\cf5  identifier = region.\cf6 identifier
+\f1 \cf0 \
+
+\f0 \cf5             \cf9 print\cf5 (\cf8 "user entered region"\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5             \cf9 print\cf5 (region.\cf6 identifier\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5             \cf9 print\cf5 (\cf8 "monitoring is working"\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5             \cf11 triggerNotification\cf5 (bool: \cf4 true\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 // Handling a region-exited notification
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  locationManager(\cf4 _\cf5  manager: \cf6 CLLocationManager\cf5 , didExitRegion region: \cf6 CLRegion\cf5 ) \{
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 if\cf5  \cf4 let\cf5  region = region \cf4 as\cf5 ? \cf6 CLCircularRegion\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 let\cf5  identifier = region.\cf6 identifier
+\f1 \cf0 \
+
+\f0 \cf5            \cf2 // triggerTaskAssociatedWithExitingRegionIdentifier(regionID: identifier)
+\f1 \cf0 \
+
+\f0 \cf5             \cf9 print\cf5 (\cf8 "user Exited region"\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5             \cf9 print\cf5 (region.\cf6 identifier\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5             \cf9 print\cf5 (\cf8 "monitoring is working"\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5             \cf11 triggerNotification\cf5 (bool: \cf4 false\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //MARK: - Networking
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 /***************************************************************/
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Write the getWeatherData method here:
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  getWeatherData(url: \cf6 String\cf5 , parameters: [\cf6 String\cf5 : \cf6 String\cf5 ]) \{
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         Alamofire.\cf11 request\cf5 (url, method: .\cf11 get\cf5 , parameters: parameters).\cf11 responseJSON\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5             response \cf4 in
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 if\cf5  response.\cf7 result\cf5 .\cf7 isSuccess\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5                 
+\f1 \cf0 \
+
+\f0 \cf5                \cf2 // print("Success! Got the weather data")
+\f1 \cf0 \
+
+\f0 \cf5                 \cf4 let\cf5  weatherJSON : \cf7 JSON\cf5  = \cf7 JSON\cf5 (response.\cf7 result\cf5 .\cf7 value\cf5 !)
+\f1 \cf0 \
+
+\f0 \cf5                 
+\f1 \cf0 \
+
+\f0 \cf5                 
+\f1 \cf0 \
+
+\f0 \cf5               \cf2 //  print(weatherJSON)
+\f1 \cf0 \
+
+\f0 \cf5                 
+\f1 \cf0 \
+
+\f0 \cf5                 \cf4 self\cf5 .\cf11 updateWeatherData\cf5 (json: weatherJSON)
+\f1 \cf0 \
+
+\f0 \cf5                 
+\f1 \cf0 \
+
+\f0 \cf5             \}
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 else\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5               \cf2 //  print("Error \\(String(describing: response.result.error))")
+\f1 \cf0 \
+
+\f0 \cf5                 \cf4 self\cf5 .\cf7 cityLabel\cf5 .\cf6 text\cf5  = \cf8 "Connection Issues"
+\f1 \cf0 \
+
+\f0 \cf5             \}
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //MARK: - JSON Parsing
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 /***************************************************************/
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Write the updateWeatherData method here:
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  updateWeatherData(json : \cf7 JSON\cf5 ) \{
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 let\cf5  tempResult = json[\cf8 "main"\cf5 ][\cf8 "temp"\cf5 ].\cf7 doubleValue
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5             \cf7 weatherDataModel\cf5 .\cf7 temperature\cf5  = \cf6 Int\cf5 (tempResult - \cf10 273.15\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5             \cf7 weatherDataModel\cf5 .\cf7 city\cf5  = json[\cf8 "name"\cf5 ].\cf7 stringValue
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5             \cf7 weatherDataModel\cf5 .\cf7 condition\cf5  = json[\cf8 "weather"\cf5 ][\cf10 0\cf5 ][\cf8 "id"\cf5 ].\cf7 intValue
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5             \cf7 weatherDataModel\cf5 .\cf7 weatherIconName\cf5  = \cf7 weatherDataModel\cf5 .\cf11 updateWeatherIcon\cf5 (condition: \cf7 weatherDataModel\cf5 .\cf7 condition\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5             \cf11 updateUIWithWeatherData\cf5 ()
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf2 //        else \{
+\f1 \cf0 \
+
+\f0 \cf2 //            cityLabel.text = "Weather Unavailable"
+\f1 \cf0 \
+
+\f0 \cf2 //        \}
+\f1 \cf0 \
+
+\f0 \cf2 //    \}
+\f1 \cf0 \
+\
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //MARK: - UI Updates
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 /***************************************************************/
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Write the updateUIWithWeatherData method here:
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  updateUIWithWeatherData() \{
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf7 cityLabel\cf5 .\cf6 text\cf5  = \cf7 weatherDataModel\cf5 .\cf7 city
+\f1 \cf0 \
+
+\f0 \cf5         \cf7 temperatureLabel\cf5 .\cf6 text\cf5  = \cf8 "\cf5 \\\cf8 (\cf7 weatherDataModel\cf5 .\cf7 temperature\cf8 )\'b0"
+\f1 \cf0 \
+
+\f0 \cf5         \cf7 weatherIcon\cf5 .\cf6 image\cf5  = \cf6 UIImage\cf5 (named: \cf7 weatherDataModel\cf5 .\cf7 weatherIconName\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //MARK: - Location Manager Delegate Methods
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 /***************************************************************/
+\f1 \cf0 \
+\
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Write the didUpdateLocations method here:
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  locationManager(\cf4 _\cf5  manager: \cf6 CLLocationManager\cf5 , didUpdateLocations locations: [\cf6 CLLocation\cf5 ]) \{
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 let\cf5  location = locations[locations.\cf6 count\cf5  - \cf10 1\cf5 ]
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 if\cf5  location.\cf6 horizontalAccuracy\cf5  > \cf10 0\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 self\cf5 .\cf7 locationManager\cf5 .\cf9 stopUpdatingLocation\cf5 ()
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5             \cf2 //print("longitude = \\(location.coordinate.longitude), latitude = \\(location.coordinate.latitude)")
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 let\cf5  latitude = \cf6 String\cf5 (location.\cf6 coordinate\cf5 .\cf6 latitude\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 let\cf5  longitude = \cf6 String\cf5 (location.\cf6 coordinate\cf5 .\cf6 longitude\cf5 )
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 let\cf5  params : [\cf6 String\cf5  : \cf6 String\cf5 ] = [\cf8 "lat"\cf5  : latitude, \cf8 "lon"\cf5  : longitude, \cf8 "appid"\cf5  : \cf7 APP_ID\cf5 ]
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5             \cf11 getWeatherData\cf5 (url: \cf7 WEATHER_URL\cf5 , parameters: params)
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Write the didFailWithError method here:
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  locationManager(\cf4 _\cf5  manager: \cf6 CLLocationManager\cf5 , didFailWithError error: \cf6 Error\cf5 ) \{
+\f1 \cf0 \
+
+\f0 \cf5         \cf9 print\cf5 (error)
+\f1 \cf0 \
+
+\f0 \cf5         \cf7 cityLabel\cf5 .\cf6 text\cf5  = \cf8 "Location Unavailable"
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+\
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //MARK: - Change City Delegate methods
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 /***************************************************************/
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Write the userEnteredANewCityName Delegate method here:
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 func\cf5  userEnteredANewCityName(city: \cf6 String\cf5 ) \{
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 let\cf5  params : [\cf6 String\cf5  : \cf6 String\cf5 ] = [\cf8 "q"\cf5  : city, \cf8 "appid"\cf5  : \cf7 APP_ID\cf5 ]
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf11 getWeatherData\cf5 (url: \cf7 WEATHER_URL\cf5 , parameters: params)
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+\
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf2 //Write the PrepareForSegue Method here
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     \cf4 override\cf5  \cf4 func\cf5  prepare(for segue: \cf6 UIStoryboardSegue\cf5 , sender: \cf4 Any\cf5 ?) \{
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5         \cf4 if\cf5  segue.\cf6 identifier\cf5  == \cf8 "changeCityName"\cf5  \{
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5             \cf4 let\cf5  destinationVC = segue.\cf6 destination\cf5  \cf4 as\cf5 ! \cf7 ChangeCityViewController
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5             destinationVC.\cf7 delegate\cf5  = \cf4 self
+\f1 \cf0 \
+
+\f0 \cf5             
+\f1 \cf0 \
+
+\f0 \cf5         \}
+\f1 \cf0 \
+
+\f0 \cf5         
+\f1 \cf0 \
+
+\f0 \cf5     \}
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5     
+\f1 \cf0 \
+
+\f0 \cf5 \}
+\f1 \cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+}
