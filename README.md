@@ -1,5 +1,5 @@
 # Completed in groups of 4
 
-![App Notification]
-(https://github.com/matthewduc/Hackathon-Geolocation/blob/master/Screen%20Shot%202018-12-01%20at%207.06.14%20PM.png)
+## App Notification
 
+<img width="482" alt="Screen Shot 2018-12-01 at 7 06 14 PM" src="https://user-images.githubusercontent.com/57783476/178598538-74bf3985-e947-496b-a99e-1f7d15ad55b7.png">
