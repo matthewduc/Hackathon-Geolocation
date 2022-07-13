@@ -1,4 +1,6 @@
-# Completed in groups of 4
+# Harvey Mudd College Hackathon
+## App Idea Clocker: Implements location based notification system (Geolocation)
+#### Clocker would notify a user to Clock-in to work within the vicinity of the workplace
 
 ## App Notification
 <img width="775" alt="Screen Shot 2018-12-01 at 7 06 09 PM" src="https://user-images.githubusercontent.com/57783476/178598690-7ecd3f62-17eb-4960-bcf1-4ca2fb1a5abf.png">
